@@ -1,2 +1,3 @@
 # devops-notes
-Personal notes
+Personal notes on:
+* Linux commands
