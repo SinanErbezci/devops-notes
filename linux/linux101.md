@@ -114,3 +114,95 @@ History of commands you've entered.
 * Ctrl + R -> reverse search through history
 * history -c ->clear history
 * history -w -> save history to ~/.bash_history
+
+### cp
+Using wildcards for bulk copying:
+- "*" -> matches any sequences
+- "?" -> matches single char
+- "[]" -> matches those chars
+
+```bash
+# copy directories (recursively)
+cp -r Pumpkin /home/pete/Pictures
+```
+
+```bash
+# when there's a overwrite, it prompts for confirmation
+cp -i 
+```
+
+```bash
+# force overwrite
+cp -f 
+```
+
+```bash
+# preserve metadata(timestamp)
+cp -p
+```
+
+### mv
+```bash
+# Renaming file or directories
+mv sinan.txt ahmet.txt 
+```
+
+#### It also moves files and directories like cp command.
+
+### mkdir
+```bash
+# create nested directories
+mkdir -p books/series/harrypotter
+```
+
+### find
+```bash
+# find [path] [expression(can use wildcards)]
+find /home -name sinan.txt
+# search by type
+find /home -type d -name sinan.txt
+```
+
+### whatis
+```bash
+# one line description
+whatis cat
+```
+
+### alias
+Rather than typing long commands create a shortcut with "alias"
+```bash
+alias ll='ls -la'
+```
+
+### Making alias permanent
+You should save it in ~/.bashrc (bash config file)
+
+open it with nano ~/.bashrc
+
+close the terminal and reload it with "source"
+
+```bash
+# removing alias
+unalias ll
+```
+
+### Understanding stdout(Standart out)
+By default, many commands gives output to stdout which is your terminal screen.
+
+You can redirect this by using ">". takes the data from stdout to destination.
+
+```bash
+# double >> appends rather than overwriting
+echo "sinan" >> newfile.txt
+```
+
+### stdin(Standard IN)
+By default, program receives its stdin from keyboard but you can change that.
+
+Every command-line process in Linux operates with at least two fundamental data streams: standard input (stdin) and standard output (stdout). A program reads data from stdin and writes its results to stdout. 
+
+```bash
+# take peanuts.txt as input rather than keyboard.
+cat < peanuts.txt
+```
