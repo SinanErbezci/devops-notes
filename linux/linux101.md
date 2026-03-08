@@ -413,3 +413,66 @@ grep -e "-v" file.txt
 - "-f" -> patterns from a file
 
 You can also use regex.
+
+
+### Regex
+"^" -> matches beginning of a line
+"$" -> matches end of a line
+"." -> match single char
+"[]" -> char sets
+"[^]" -> except those chars
+"[a-c]" -> char ranges
+
+### Vim
+#### Searching and Navigation
+/searched-word -> first occurence after cursor point
+?searched-word -> same but backwards search
+n -> jump to next match
+h -> left or arrow keys
+j -> right
+k -> up
+l -> down
+
+#### Vim Inserting and Appending Text
+There are two modes:normal for executing commands and insert mode for typing.
+
+To go back normal mode use "Esc" key.
+
+"i" -> insert current position
+"a" -> append text after cursor
+"I" -> at the beginning of the line
+"A" -> at the end of line
+"o" -> add new line below
+"O" -> add new line above
+
+#### Vim Operators and Motions
+operator + motion.
+
+dw -> d is operator action (delete) and w is movement (word).
+
+You can also count. 2dw -> delete two words
+
+x -> Delete char 
+dw -> delete cursor to the beginning of next word
+d$ -> cursor to the end of line
+dd -> entire current line
+
+cw – Changes the text from the cursor to the end of the word.
+c$ – Changes text from the cursor to the end of the line.
+cc – Changes the entire current line.
+
+yw – Yanks (copies) a word.
+yy – Yanks the entire current line.
+p – Puts (pastes) the yanked text after the cursor or on the line below.
+P – Puts the text before the cursor or on the line above.
+
+r{char} – Replaces the single character under the cursor with the specified character.
+R – Enters Replace mode, allowing you to overwrite text continuously until you press Esc.
+J – Joins the current line with the next one.
+. – Repeats the last change you made, a very powerful and efficient command.
+
+:w -> saves the current stat
+:q -> quit only if you saved
+:q! -> quit and discard any changes
+:wq -> save and quit
+:u -> undo last action,
