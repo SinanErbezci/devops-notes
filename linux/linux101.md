@@ -612,4 +612,141 @@ sudo chmod 4755 myfile
 ```
 
 ### Setgid
-something but with group. Run as if it were a member of that group.
+samething but with group. Run as if it were a member of that group.
+```bash
+sudo chmod g+s myfile
+sudo chmod 2555 myfile
+```
+
+### Process Permissions
+There are three UIDs associated with every process.
+
+When you launch a process, it runs with the same permissions as the user or group that ran it. This is known as an **effective user ID**. This UID is used to grant access rights to a process. So, naturally, if Bob ran the touch command, the process would run as him, and any files he created would be under his ownership.
+
+There is another UID, called the **real user ID**. This is the ID of the user that launched the process. These are used to track down who the user who launched the process is.
+
+One last UID is the **saved user ID**. This allows a process to switch between the effective UID and real UID, and vice versa
+
+### The Sticky Bit
+The sticky bit is a permission setting that can be applied to a directory. When a directory has the sticky bit set, files within that directory can only be deleted or renamed by the file's owner, the directory's owner, or the root user. This is particularly useful for shared directories where multiple users need to create and manage their own files without interfering with others.
+```bash
+# drwxrwxrwt 
+chmod +t my_shared_dir
+chmod 1755 my_shared_dir
+```
+
+
+## Processes
+Each process is assigned a unique number called the process ID (PID). PIDs are typically assigned sequentially as new processes are created.
+```bash
+ps
+```
+```
+$ ps
+PID        TTY     STAT   TIME          CMD
+41230    pts/4    Ss        00:00:00     bash
+51224    pts/4    R+        00:00:00     ps
+```
+- PID: Process ID
+- TTY: Controlling terminal for the process
+- STAT: Current status of the process
+- TIME: Total CPU time process has used
+- CMD: the command that started the process
+
+#### Other options
+```bash
+ps aux
+```
+a -> displayy all process for all users
+u -> detailed, user-oriented format
+x -> Includes proccess not attached to any terminal.
+```bash
+# System V style
+ps -ef
+```
+
+#### Real Time monitoring with top
+real time 
+```bash
+top
+```
+
+### Controlling Terminal
+TTY refers to the terminal that provides the standard input and output for a process.
+
+There are two main types of terminals you will encounter: terminal devices and pseudo-terminal devices.
+
+A true terminal device is a native console that allows you to type commands and see output directly. You can experience this by switching to a virtual console. On many systems, you can press Ctrl-Alt-F1 to access TTY1. To return to your graphical session, you can typically use Ctrl-Alt-F7.
+
+A pseudo-terminal (PTS), on the other hand, is what you most commonly use. When you open a terminal application within your graphical desktop environment, you are using a PTS. These emulate a terminal within a window.
+
+Most processes are bound to a controlling terminal. This means the process's lifecycle is tied to the terminal session that started it.
+
+Some processes, known as daemons, are designed to run in the background and manage system services. These processes often start when the system boots and stop only when it shuts down. To prevent them from being accidentally terminated, daemons are not attached to a controlling terminal. (you will see a question mark (?) in the TTY column. )
+
+* look for more details
+
+### kill (terminate)
+```bash
+# kill <pid>
+kill 12345
+```
+#### Forcing Termination with SIGKILL
+```bash
+# Forcefull termination. Without giving it a chance of clean up.
+kill -9 12345
+```
+#### Understanding Other Common Signals
+- SIGHUP:  (signal 1) traditionally sent to a process when its controlling terminal is closed. It can be used to tell daemon processes to reload their configuration files.
+- SIGINT: (signal 2) Sent when you enter Ctrl+C.
+- SIGSTOP: (signal 19) Pauses process without terminating.
+```bash
+#  checks if a process with the specified PID exists
+kill -0 12345
+```
+
+### niceness
+The niceness of a process is represented by a number ranging from -20 (highest priority) to 19 (lowest priority).
+
+A high niceness value (e.g., 19) means the process is very "nice" and has a low priority, yielding CPU time to others.
+A low or negative niceness value (e.g., -20) means the process is not "nice" and demands more CPU time, giving it a higher priority.clear
+```bash
+# look at ni column
+top
+```
+```bash
+nice -n 5 apt update
+# change niceness already running process
+renice 10 -p 12345
+```
+
+### Process States
+R -> Running or Runnable.
+S -> Interruptiple Sleep. Process is waiting for an event to complete.
+D -> Uninterruptiple Sleep. Cannot be interrupted by a signal.
+Z -> Zombie. It is waiting for its parent process to read its exit status
+T -> Stopped. Suspended by a signal. Can be continued with SIGCONT.
+
+### /proc filesystem
+In linux everything is treated as a file. This concept extends to running processes, whose information is dynamically stored in a special virtual filesystem known as /proc.
+
+The /proc filesystem is not a real filesystem on your hard drive; it's created in memory by the kernel. It provides a window into the kernel's internal data structures and the state of the system.
+
+### Job Control
+You can manage multiple background processes with a single terminal.
+
+"&" -> this immediately returns shell prompt while first command continues to run.
+```bash
+sleep 1000 &
+sleep 1001 &
+sleep 1002 &
+```
+
+```bash
+# list all background jobs
+jobs
+```
+
+Also during the program is running you can type **Control + Z** then use the **bg** command to send that suspended job to background. 
+
+Also you can move it to foreground by **fg %(job_id)**.
