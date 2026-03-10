@@ -476,3 +476,140 @@ J – Joins the current line with the next one.
 :q! -> quit and discard any changes
 :wq -> save and quit
 :u -> undo last action,
+
+## User Management
+Every user on a Linux system is assigned a personal home directory generally located at **/home/username**. User specific and configs are stored there.
+
+The system identifies users with user id(UID) and groups id (GID).
+
+The root user has unlimited power, capable of accessing any file and managing any process.
+
+Authorized users can execute commands with root privileges using **sudo** (superuser do).
+
+### root
+**su** (subsitute user) command open new shell session for the linux root user. Also you can switch to any user with this command.
+
+Actions performed in a root shell are not logged under your personal user account, making it difficult to audit system changes.
+
+Who can access sudo privilege? **/etc/sudoers/** This file lists users and groups who grantted access.
+
+### /etc/passwd
+The mapping between username and UIDs is stored in **/etc/passwd/**.
+
+#### Dissecting the /etc/passwd Fields
+```
+root:x:0:0:root:/root:/bin/bash
+```
+let's break down:
+- Username: The login name of the user(root)
+- Password: A placeholer of users encrypted password.
+x -> encrypted password | * -> locked and cannot login | blank -> no passwprd
+- User ID(UID): num id (root always 1)
+- Group Id: primary group
+- GECOS Field: Comment field.
+- Home directory: user directory
+- Default shell: executed upon login
+
+### /etc/shadow
+Stores sensitive user authentication info. Needs superuser privilege
+
+User passwords and password aging policy.
+```
+root:MyEPTEa$6Nonsense:15000:0:99999:7:::
+```
+Lets break it down:
+- Username: login name
+- encrypted password: hashed user password. ! or * -> locked
+- Date of last password change: The number of days since January 1, 1970
+- Min password age: min days must pass before user can change their password again.
+- Max password age: max days the password is valid.
+- Password warning period
+- Password inactivity period: 
+- Account expiration date
+- reserved field
+
+### /etc/group
+List of all user groups.
+```
+root:*:0:pete
+```
+- Group name
+- Group password: legacy feature
+- Group ID
+- List of users
+
+## File Permissions
+**drwxr-xr-x**. 
+Has 4 main parts. First char is file type. d -> dictionary, - -> file
+d | rwx | r-x | r-x
+r: read permisson
+w: write permission
+x: execute permission
+-: no permission
+
+First set -> User(owner)
+Second set -> Group associated with the file
+Third set -> all other users
+
+### Modifying Permissons
+#### Symbolic Mode
+```bash
+# adds executable permission to user
+chmod u+x myfile
+```
+"+" -> add permission "-" -> remove permission
+
+Also you can add multiple permission at once
+```bash
+chmod ug+w myfile
+```
+#### Numerical Mode
+- 4 -> read(r)
+- 2 -> write(w)
+- 1 -> execute(x)
+
+To set a permission set, you add numbers together.
+
+4 + 2 + 1 = 7. So 7 gives all the permission
+```bash
+# user  rwx, group r-x, others r-x
+chmod 755 myfile
+```
+
+## Ownership Permissions
+```bash
+# give ownership of the file to patty
+sudo chown patty myfile
+```
+```bash
+# change group ownership
+sudo chgrp whales myfile
+```
+```bash
+# both at the sametime
+sudo chown patty:whales
+```
+
+### Umask
+Every file that gets created comes with a default set of permissions. If you ever want to change that default set of permissions, you can do so with the umask command. 
+```bash
+# this takes away permissions
+# user -> all access, group -> no write, others -> no execute
+umask 021
+```
+
+### Setuid
+Every file that gets created comes with a default set of permissions. If you ever want to change that default set of permissions, you can do so with the umask command.
+
+-rwsr-xr-x
+
+s -> suid. when a file has this permission set, it allows the users who launched the program to get the file owner's permission as well as execution permission
+
+#### Modifying SUID
+```bash
+sudo chmod u+s myfile
+sudo chmod 4755 myfile
+```
+
+### Setgid
+something but with group. Run as if it were a member of that group.
