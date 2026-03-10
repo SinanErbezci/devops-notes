@@ -750,3 +750,16 @@ jobs
 Also during the program is running you can type **Control + Z** then use the **bg** command to send that suspended job to background. 
 
 Also you can move it to foreground by **fg %(job_id)**.
+
+### tar and gzip
+tar -> archiving, gzip -> compression
+```bash
+gzip myfile
+gunzip myfile.gz
+# c-> new acrhive, v->verbose, f-> next argument name of the tar
+tar cvf myarchive.tar file1 file2 file3
+# compressed tar 
+tar cvzf 
+# extract compressed tar
+tar xzvf myarchive.tar.gz
+```
