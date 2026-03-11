@@ -763,3 +763,255 @@ tar cvzf
 # extract compressed tar
 tar xzvf myarchive.tar.gz
 ```
+
+## Devices
+In Linux, every device connected to your system, from hard drives to keyboards, is represented by a special file.
+
+These files, known as device files or device nodes, provide a way for software to interact with the hardware drivers. The central location for these files is the /dev directory.
+
+### /dev directory
+It contains special files that represent devices.
+```bash
+# list devices
+ls /dev
+```
+/dev/null -> special device that ignores all inputs
+
+### Device Types
+```bash
+ls -l /dev
+# Major device number -> driver responsible for the device
+# minor device number -> instance of the device
+```
+First char in the permission string indicates file type.
+- c -> char. Transfer data one char at a time. Many OS functions.
+- b -> block. transfer data in blocks. Hard drives, ssds
+- p -> pipe. fifo. inter-process com.
+- s -> socket. more versatile.
+
+### Device Names
+Linux controls storage devices through SCSI(Small Computer System Interface).
+
+That's why storage device name starts with **sd**.
+
+/dev/sda3 -> sd: mass storage device, a:first device, 3:partition
+
+PseudoDevices -> not real physical devices but system functions.
+
+/dev/random: stream of random numbers
+/dev/null: discards all input and no output
+/dev/zero: discards all input output NULL bytes.
+
+### sysfs
+It is a virtual filesystem, mounted at /sys. Exports info about kernel objects, hardware devices and drivers.
+
+Represent the current state of the sys system.
+
+### /sys Directory
+Gives info about:
+- manufacturer and model,
+- where the device plugged in,
+- current state, position in the device hieararchy.
+
+### sysfs vs /dev
+/dev -> device nodes which are special files that allow programs to access the devices
+/sys -> view info and manage the devices. Underlying model of the device.
+
+### udev
+The udev system dynamically creates and removes devices. No need manually add and remove devices.
+
+###  lsusb, lspci, lsscsi
+lsusb -> listing usb devices
+lspci -> pci devices
+lsscsi -> scsi and sata (storage)
+
+### dd
+Reads for file or datastream, writes to output file and datastream.
+
+```bash
+# if:input file, of:output file, bs:block size
+dd if=/home/pete/backup.img of=/dev/sdb bs=1024
+```
+
+## The file systems
+### The Main Directories
+- /bin -> essential commandline programs(ls, cp etc.)
+- /sbin -> essential system binaries.
+- /etc -> core system config directory. no exec only config for system and apps
+- /lib -> essential shared library files.
+- /boot -> files required for system boot
+- /home -> personal directory for each user
+- /root -> home directory for root user
+- /opt -> optional or third part application software packages.
+- /usr -> user-installed software and packages.
+- /var -> variable and stores files that are expected to change in size. (system logs, caches etc)
+- /tmp -> files in this deleted upon system reboot
+- /run -> Running system info (pids, runtime data etc)
+- /dev -> device files
+- /media -> removable media like usb, sd cards, cd-roms
+- /mnt -> generic mount point for temporarily mounting filesystems
+- /proc -> virtual filesystem realtime info about proccess and kernel paramaters
+- /srv -> site-specific data such as files for a web server
+### Filesystem Types
+linux supports wide range of filesystems. To work seamlessly with different filesystem, linux uses Virtual file system(VFS).
+
+common file system types:
+- ex4: Linux extended filesystem.
+- btrfs: B-tree FS. with advanced features
+- XFS: large files and parallel I/O.
+- NTFS and FAT: standard windows filesystem.
+- HFS+: macOS
+```bash
+# list your filesystem
+df
+```
+
+### Disk Partitioning
+- fdisk: basic command line partitioning tool. not support GPT
+- parted: support both MBR and GPT
+- gparted: graphical version of parted.
+- gdisk: only support GPT
+```bash
+# listing existing partitions
+sudo parted -l
+```
+```bash
+# launching interactive mode
+sudo parted
+```
+```bash
+#select the disk you want to modify
+select /dev/sdb
+# viewing the partition table
+print
+# creating a partition
+mkpart primary ext4 1MB 5000MB
+# resizing a partition
+resizepart 1 8000MB
+```
+### Creating Filesystem(Formatting)
+```bash
+mkfs -t ext4 /dev/sdb2
+```
+
+### Mounting and Unmounting
+```bash
+# First create a mount point
+mkdir /mydrive
+# Attach device
+sudo mount -t ext4 /dev/sdb2 /mydrive
+```
+```bash
+umount /mydrive
+```
+
+Kernel names of the device can change with reboots. To avoid issues, use UUID.
+```bash
+# view block device UUIDs
+blkid
+# mount with UUID
+mount UUID=<...> /mydrive
+```
+
+### Mounts filesystem at startup
+You configure them in a special configuration file at **/etc/fstab**.
+
+This file contains a permanent list of filesystems that the system should mount during the boot process.
+
+#### /etc/fstab
+```plaintext
+pete@icebox:~$ cat /etc/fstab
+UUID=130b882f-7d79-436d-a096-1e594c92bb76 /               ext4    relatime,errors=remount-ro 0       1
+UUID=78d203a0-7c18-49bd-9e07-54f44cdb5726 /home           xfs     relatime        0       2
+UUID=22c3d34b-467e-467c-b44d-f03803c2c526 none            swap    sw              0       0
+```
+let's break down:
+- Device Identifier: UUID
+- Mount point: / or /home
+- Filesystem Type: ex4, xfs etc.
+- Options: how the filesystem is mounted. Different options.
+- Dump: if a file system needs to backed up.
+- Pass: order for checking filesystems at boot time. 0 -> no checkhing
+
+### swap
+allocate virtual memory on disk.
+
+### Disk Usage
+```bash
+# Checking Filesystem space with df
+df -h
+# Disk usade for each subdirectory in your current location
+du -h
+```
+
+### Filesystem Repair
+**fsck** -> check consistency of a filesystem
+
+### Inodes
+Every file and directory has its own inode. It's metadate that describes:
+- file type
+- owner, group
+- permissions etc.
+
+If you run out of inode space, you cannot create new files. check it with **df -i**.
+
+check inode number with **ls -li**.
+
+### File Links
+There are two type of links: symlink, hard links.
+
+symlink -> it's the same with shortcuts in windonws.
+hardlink -> creates another file entry that points directly to the same inode as the original file.
+```bash
+# symlink
+ln -s /path/to/original /path/to/link
+# hardlink
+ln /path/to/original /path/to/link
+```
+
+## Boot Process Overview
+BIOS -> Bootloader -> Kernel -> Init
+Bootloader -> load kernel into memory. Configure kernel parameters
+Kernel -> loading drivers, locating boot and starting init
+init -> Parent of all other processes. 3 different ways (System V, Upstart, systemd)
+
+## Tracking Procceses: top
+top -> tracking processes in real time
+lsof -> list of all open files and proccesses using them
+```bash
+# processes are using the current directory.
+lsof .
+```
+fuser -> which processes using specific files, sockets or filesystems.
+```bash
+# kill all processes  using a mount point
+fuser -k /mnt/usb
+```
+
+### uptime
+uptime -> load average: 0.00. 0.02, 0.05 -> 1, 5, 15 min interval
+
+### Other Montioring Tools
+I/O Monitoring -> iostat
+Memory Moninotring -> vmstat
+Continous Monitoring -> sar
+
+### Cron Jobs
+```plaintext
+Cron Job Syntax
+30 08 * * * /home/pete/scripts/change_wallpaper
+```
+First 5 are time and date fields. "*" meaning every.
+So this means this command runs at 8:30 Am, every day of the month, every month, everyday of the week.
+
+```bash
+# edit your cron jobs
+crontab -e
+```
+
+## Logging
+syslog -> core service responsible for gathering info
+rsyslogd -> daemon, waiting for event messagaes.
+dmesg -> kernel logging. For hardware issues
+auth.log -> authentication logging
+logrotate -> log rotation.
