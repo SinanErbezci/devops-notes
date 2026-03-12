@@ -1015,3 +1015,43 @@ rsyslogd -> daemon, waiting for event messagaes.
 dmesg -> kernel logging. For hardware issues
 auth.log -> authentication logging
 logrotate -> log rotation.
+
+## Network Sharing
+### The Secure Copy Command (scp)
+operates over SSH.
+```bash
+# from local host to remote host
+scp myfile.txt username@hostname:/remote/dict
+# from remote host to local
+scp username@hostname:/remote/dict/myfile.txt /local/directory
+# copy directory to remote
+scp -r mydir username@hostname:/remote/dict 
+```
+### rsync
+Uses delta-transfer algo. Only transfer different parts of the file.
+```bash
+rsync -avh /local/directory username@hostname:/remote/dict
+```
+### NFS
+```bash
+service nfsclient start
+mount server:/directory /mount_directory
+```
+autmount for NFS
+
+### Samba
+sharing files between Windows and Linux. SMB/CIFS protocol.
+
+### Finding Your IP Adress
+```bash
+# legacy method
+ifconfig -a
+# modern approach
+ip addr show
+```
+
+### Routing Table
+```bash
+# U-> route is up, G->route to a gateway,
+route -n
+```
