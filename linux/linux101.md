@@ -1055,3 +1055,71 @@ ip addr show
 # U-> route is up, G->route to a gateway,
 route -n
 ```
+
+
+### Network Interfaces
+```bash
+# show info for all interfaes
+ip link show
+# show detailed specific interface
+ip -s link show eth0
+# show IP address assigned to interfaces
+ip address show
+# Bring interface up/down
+ip link set eth0 up
+# add ip adress
+ip address add 192.168.1.1/24 dev eth0
+```
+eth0 -> first ethernet cable
+wlan0 -> wireless interface
+lo -> loopback(locally)
+HWaddr -> unique Mac adress
+inet -> ipv4
+inet6 -> ipv6
+
+These settings changes after reboot. To make them persistent, edit config file located **/etc/network/interfaces**.
+
+### route
+route command is a legacy command. ip is now peferred.
+```bash
+# adding route
+ip route add 192.168.2.1/23 via 10.11.12.3
+# deleting route
+ip route delete 192.168.2.1/23 via 10.11.12.3
+```
+
+### Network Manager
+nmcli
+
+### ICMP 
+Internet Control Message Protocol. Used for reporting errors and sending operational info.
+
+#### ICMP Message Structure
+- Type: Category of the message. 
+- Code: More specific info about the message type.
+- Checksum: verify the integrity of the message.
+
+#### Common ICMP Types
+- Type 8 Echo Request: ping command to check connectivity.
+- Type 0 Echo Reply: respond to ping. Connection is establised.
+- Type 3 Destination Unreachable:  packet cannot be delivred its final destination
+- Type 11 Time Exceeded: ttl reaches zero before it arrives.
+
+### ping
+Used to test if a remote host is reachable across an IP network.
+```bash
+# sends one packet per second.
+ping google.com
+```
+icmp seq missing -> packet loss
+out of order -> latency
+
+#### TTL
+ttl -> each time packet passes through a router(hop) the ttl value is decremented by one.
+If reaches zero before arrival, it's discarded.
+
+#### Time
+primary indicator of network latency. Roundtrip time. your machine -> host -> your machine.
+
+### traceroute
+Trace the path that packets take.
