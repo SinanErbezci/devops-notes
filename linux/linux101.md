@@ -1,3 +1,4 @@
+for network debugging use nicolaka/netshoot
 ### The Shell Prompt
 ```bash
 # username@hostname:/current_directory $
@@ -1123,3 +1124,4 @@ primary indicator of network latency. Roundtrip time. your machine -> host -> yo
 
 ### traceroute
 Trace the path that packets take.
+

@@ -72,3 +72,19 @@ ls /workspace/file-exits > output.txt 2>&1
 # silence errors
 command 2>/dev/null
 ```
+
+### Listening network sockets
+```bash
+# t-> tcp, u->udp, l-> listening, -n->numeric
+ss -tuln
+```
+
+### Some data editing
+```bash
+# comma separeated file, get the first column
+awk -F "," '{print $1}' data/servers.csv
+```
+```bash
+# i->inplace, s->substitute, g->global
+sed -i 's/django/app/g' data/servers.csv 
+```
